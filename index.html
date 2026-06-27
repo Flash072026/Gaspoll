@@ -51,9 +51,10 @@
             <div id="debug-info" class="hidden mt-4 mx-auto max-w-xl p-4 bg-slate-800 border border-red-500/30 rounded-lg text-left text-xs font-mono text-red-300 overflow-x-auto"></div>
         </div>
 
+        <!-- TABEL PLATINUM -->
         <div id="platinum-container" class="hidden bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700">
             <div class="p-3.5 bg-slate-750 border-b border-slate-700 font-bold text-xs sm:text-sm tracking-wide text-slate-300 uppercase">
-                🔥 TOP 10 PLATINUM (Rank 1 - 10)
+                🔥 TOP 10 PLATINUM
             </div>
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-0 table-fixed sm:table-auto">
@@ -71,9 +72,10 @@
             </div>
         </div>
         
+        <!-- TABEL GOLD -->
         <div id="gold-container" class="hidden bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700">
             <div class="p-3.5 bg-slate-750 border-b border-slate-700 font-bold text-xs sm:text-sm tracking-wide text-slate-300 uppercase">
-                🔥 TOP 10 GOLD (Rank 11 - 20)
+                🔥 TOP 10 GOLD
             </div>
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-0 table-fixed sm:table-auto">
@@ -91,9 +93,10 @@
             </div>
         </div>
         
+        <!-- TABEL BRONZE -->
         <div id="bronze-container" class="hidden bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700">
             <div class="p-3.5 bg-slate-750 border-b border-slate-700 font-bold text-xs sm:text-sm tracking-wide text-slate-300 uppercase">
-                🔥 TOP 10 BRONZE (Rank 21 - 30)
+                🔥 TOP 10 BRONZE
             </div>
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-0 table-fixed sm:table-auto">
@@ -134,7 +137,7 @@
                 </div>
                 <div class="bg-slate-900/60 p-3.5 rounded-lg border border-slate-750">
                     <div class="text-amber-400 text-base font-bold mb-0.5">🎁 TOTAL HADIAH</div>
-                    <p class="text-sm font-semibold text-emerald-400">3 Outlet Teratas</p>
+                    <p class="text-sm font-semibold text-emerald-400">3 Outlet Teratas (Platinum)</p>
                     <p class="text-xs text-slate-400 mt-1">Rank 1 saldo Rp 500.000</p>
                     <p class="text-xs text-slate-400 mt-1">Rank 2 saldo Rp 350.000</p>
                     <p class="text-xs text-slate-400 mt-1">Rank 3 saldo Rp 150.000</p>
@@ -218,7 +221,8 @@
         }
 
         // Fungsi bantuan untuk me-render tabel berdasar kategori
-        function renderTableSection(bodyId, dataSlice, startIndex) {
+        // Diperbarui: Parameter startIndex dihapus karena rank selalu dimulai dari 1 di setiap kelas
+        function renderTableSection(bodyId, dataSlice) {
             const tableBody = document.getElementById(bodyId);
             tableBody.innerHTML = ''; 
 
@@ -228,13 +232,14 @@
             }
 
             dataSlice.forEach((outlet, index) => {
-                const rank = startIndex + index + 1;
-                let rankBadge = `<span class="font-bold text-slate-400 text-sm">${rank}</span>`;
+                const classRank = index + 1; // Rank SELALU dimulai dari 1 untuk setiap tabel kelas
+                let rankBadge = `<span class="font-bold text-slate-400 text-sm">${classRank}</span>`;
                 let rowBg = "hover:bg-slate-750/50 transition-colors";
                 
-                if (rank === 1) rankBadge = `<span class="inline-flex items-center justify-center bg-amber-500 text-slate-950 w-14 py-0.5 rounded-full text-[11px] font-black shadow-sm">🥇 1</span>`;
-                else if (rank === 2) rankBadge = `<span class="inline-flex items-center justify-center bg-slate-300 text-slate-950 w-14 py-0.5 rounded-full text-[11px] font-black shadow-sm">🥈 2</span>`;
-                else if (rank === 3) rankBadge = `<span class="inline-flex items-center justify-center bg-amber-700 text-white w-14 py-0.5 rounded-full text-[11px] font-black shadow-sm">🥉 3</span>`;
+                // Medali diberikan ke Rank 1, 2, 3 di masing-masing kelas
+                if (classRank === 1) rankBadge = `<span class="inline-flex items-center justify-center bg-amber-500 text-slate-950 w-14 py-0.5 rounded-full text-[11px] font-black shadow-sm">🥇 1</span>`;
+                else if (classRank === 2) rankBadge = `<span class="inline-flex items-center justify-center bg-slate-300 text-slate-950 w-14 py-0.5 rounded-full text-[11px] font-black shadow-sm">🥈 2</span>`;
+                else if (classRank === 3) rankBadge = `<span class="inline-flex items-center justify-center bg-amber-700 text-white w-14 py-0.5 rounded-full text-[11px] font-black shadow-sm">🥉 3</span>`;
 
                 const rawTrx = parseInt(String(outlet[targetTrx]).replace(/[^0-9]/g, '')) || 0;
                 const maskedId = maskIdOutlet(outlet[targetId]);
@@ -262,7 +267,6 @@
                     }
                 }
 
-                // Update Header Kolom untuk semua tabel
                 if (parsed.originalHeaders && parsed.originalHeaders.length >= 3) {
                     document.querySelectorAll('.header-nama').forEach(el => el.innerText = parsed.originalHeaders[0]);
                     document.querySelectorAll('.header-id').forEach(el => el.innerText = parsed.originalHeaders[1]);
@@ -280,10 +284,10 @@
                     return trxB - trxA;
                 });
 
-                // Render Data ke 3 Tabel Berbeda
-                renderTableSection('platinum-body', globalAllOutlets.slice(0, 10), 0);   // Rank 1-10
-                renderTableSection('gold-body', globalAllOutlets.slice(10, 20), 10);     // Rank 11-20
-                renderTableSection('bronze-body', globalAllOutlets.slice(20, 30), 20);   // Rank 21-30
+                // Render Data ke 3 Tabel Berbeda tanpa parameter startIndex
+                renderTableSection('platinum-body', globalAllOutlets.slice(0, 10));   // Data urutan 1-10
+                renderTableSection('gold-body', globalAllOutlets.slice(10, 20));     // Data urutan 11-20
+                renderTableSection('bronze-body', globalAllOutlets.slice(20, 30));   // Data urutan 21-30
                 
                 // Tampilkan Container
                 document.getElementById('status-container').classList.add('hidden');
@@ -324,7 +328,26 @@
 
             if (foundIndex !== -1) {
                 const outletData = globalAllOutlets[foundIndex];
-                const rankPosisi = foundIndex + 1;
+                
+                // Menentukan informasi kelas dan peringkat di dalam kelas tersebut
+                let kelasInfo = "";
+                let rankDiKelas = 0;
+                const absoluteRank = foundIndex + 1;
+
+                if (absoluteRank <= 10) {
+                    kelasInfo = "PLATINUM";
+                    rankDiKelas = absoluteRank;
+                } else if (absoluteRank <= 20) {
+                    kelasInfo = "GOLD";
+                    rankDiKelas = absoluteRank - 10;
+                } else if (absoluteRank <= 30) {
+                    kelasInfo = "BRONZE";
+                    rankDiKelas = absoluteRank - 20;
+                } else {
+                    kelasInfo = "PESERTA";
+                    rankDiKelas = absoluteRank;
+                }
+
                 const rawTrx = parseInt(String(outletData[targetTrx]).replace(/[^0-9]/g, '')) || 0;
                 const maskedId = maskIdOutlet(outletData[targetId]);
 
@@ -336,9 +359,9 @@
                             <div class="text-xs font-mono text-slate-400 mt-0.5">ID: ${maskedId} • ${rawTrx.toLocaleString('id-ID')} Trx</div>
                         </div>
                         <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 p-3 rounded-lg text-center flex flex-col justify-center shadow-lg min-w-[140px]">
-                            <span class="text-[10px] font-black uppercase tracking-wider opacity-75">Peringkat Anda</span>
-                            <span class="text-xl font-black">Rank ${rankPosisi}</span>
-                            <span class="text-[10px] font-bold opacity-80">dari ${totalOutlet.toLocaleString('id-ID')} Outlet aktif trx menu TELKOMSEL Paket Terbaik</span>
+                            <span class="text-[10px] font-black uppercase tracking-wider opacity-75">Kelas ${kelasInfo}</span>
+                            <span class="text-xl font-black">Rank ${rankDiKelas}</span>
+                            <span class="text-[10px] font-bold opacity-80">(Peringkat Global: ${absoluteRank})</span>
                         </div>
                     </div>
                 `;
