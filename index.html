@@ -20,92 +20,82 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen pb-8">
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-8">
 
-    <header class="bg-slate-800 border-b border-slate-700 py-5 px-4 text-center shadow-lg sticky top-0 z-50 backdrop-blur-md bg-slate-800/95">
-        <h1 class="text-xl sm:text-2xl font-extrabold tracking-wider text-amber-400 uppercase">🏆 GASPOLL OUTLET 🏆</h1>
-        <p class="text-slate-400 mt-2 text-sm">Update Transaksi Terakhir: Memuat...</p>
+    <header class="bg-white border-b-4 border-red-600 py-5 px-4 text-center shadow-sm sticky top-0 z-50">
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-wider text-red-600 uppercase">?? GASPOLL OUTLET ??</h1>
+        <p class="text-slate-500 mt-2 text-sm">Update Transaksi Terakhir: Memuat...</p>
     </header>
 
     <main class="max-w-4xl mx-auto px-3 sm:px-4 mt-4 space-y-4">
         
-        <div class="bg-slate-800 p-4 sm:p-6 rounded-xl border border-slate-700 shadow-xl">
-            <h2 class="text-base sm:text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">🔍 Cek Peringkat Outlet Anda</h2>
+        <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h2 class="text-base sm:text-lg font-bold text-red-600 mb-3 flex items-center gap-2">?? Cek Peringkat Outlet Anda</h2>
             <div class="flex flex-col sm:flex-row gap-2.5">
                 <input type="text" id="search-input" placeholder="ID Outlet (cth: FX0001)" 
-                    class="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3.5 text-base text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono tracking-wider uppercase text-center sm:text-left">
+                    class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3.5 text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:border-red-600 font-mono tracking-wider uppercase text-center sm:text-left">
                 <button onclick="searchOutlet()" 
-                    class="w-full sm:w-auto bg-amber-500 active:bg-amber-600 hover:bg-amber-600 text-slate-950 font-extrabold px-6 py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md text-base min-h-[48px]">
+                    class="w-full sm:w-auto bg-red-600 active:bg-red-700 hover:bg-red-700 text-white font-extrabold px-6 py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md text-base min-h-[48px]">
                     Cari Peringkat
                 </button>
             </div>
             
-            <div id="search-result-container" class="hidden mt-4 p-4 bg-slate-950/70 border border-slate-700 rounded-lg transition-all duration-300">
+            <div id="search-result-container" class="hidden mt-4 p-4 bg-red-50 border border-red-100 rounded-lg transition-all duration-300">
             </div>
         </div>
 
         <div id="status-container" class="text-center py-8">
-            <div id="loading-spinner" class="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400 mx-auto"></div>
-            <p id="status-text" class="text-slate-400 mt-3 text-sm">Memuat data dari 3 server...</p>
-            <div id="debug-info" class="hidden mt-4 mx-auto max-w-xl p-4 bg-slate-800 border border-red-500/30 rounded-lg text-left text-xs font-mono text-red-300 overflow-x-auto"></div>
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-red-600 mx-auto"></div>
+            <p id="status-text" class="text-slate-500 mt-3 text-sm">Memuat data dari server...</p>
         </div>
 
-        <div id="platinum-container" class="hidden bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700">
-            <div class="p-3.5 bg-slate-750 border-b border-slate-700 font-bold text-xs sm:text-sm tracking-wide text-slate-300 uppercase">
-                🔥 TOP 10 PLATINUM
-            </div>
+        <div id="platinum-container" class="hidden bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200">
+            <div class="p-3.5 bg-slate-100 border-b border-slate-200 font-bold text-xs sm:text-sm tracking-wide text-slate-600 uppercase">?? TOP 10 PLATINUM</div>
             <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-0 table-fixed sm:table-auto">
-                    <thead>
-                        <tr class="bg-slate-700 text-slate-200 uppercase text-[11px] sm:text-xs tracking-wider">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-red-600 text-white">
+                        <tr class="uppercase text-[11px] sm:text-xs">
                             <th class="py-3 px-3 sm:px-6 text-center w-20">Rank</th>
-                            <th class="py-3 px-3 sm:px-6 header-nama">Nama Outlet</th>
-                            <th class="py-3 px-3 sm:px-6 w-28 sm:w-auto header-id">ID Outlet</th>
-                            <th class="py-3 px-3 sm:px-6 text-right w-28 sm:w-auto header-trx">Jumlah Trx</th>
+                            <th class="py-3 px-3 sm:px-6">Nama Outlet</th>
+                            <th class="py-3 px-3 sm:px-6">ID Outlet</th>
+                            <th class="py-3 px-3 sm:px-6 text-right">Jumlah Trx</th>
                         </tr>
                     </thead>
-                    <tbody id="platinum-body" class="divide-y divide-slate-700 text-sm">
-                    </tbody>
+                    <tbody id="platinum-body" class="divide-y divide-slate-100 text-sm"></tbody>
                 </table>
             </div>
         </div>
         
-        <div id="gold-container" class="hidden bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700 mt-6">
-            <div class="p-3.5 bg-slate-750 border-b border-slate-700 font-bold text-xs sm:text-sm tracking-wide text-slate-300 uppercase">
-                🔥 TOP 10 GOLD
-            </div>
+        <div id="gold-container" class="hidden bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200">
+            <div class="p-3.5 bg-slate-100 border-b border-slate-200 font-bold text-xs sm:text-sm tracking-wide text-slate-600 uppercase">?? TOP 10 GOLD</div>
             <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-0 table-fixed sm:table-auto">
-                    <thead>
-                        <tr class="bg-slate-700 text-slate-200 uppercase text-[11px] sm:text-xs tracking-wider">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-red-600 text-white">
+                        <tr class="uppercase text-[11px] sm:text-xs">
                             <th class="py-3 px-3 sm:px-6 text-center w-20">Rank</th>
-                            <th class="py-3 px-3 sm:px-6 header-nama">Nama Outlet</th>
-                            <th class="py-3 px-3 sm:px-6 w-28 sm:w-auto header-id">ID Outlet</th>
-                            <th class="py-3 px-3 sm:px-6 text-right w-28 sm:w-auto header-trx">Jumlah Trx</th>
+                            <th class="py-3 px-3 sm:px-6">Nama Outlet</th>
+                            <th class="py-3 px-3 sm:px-6">ID Outlet</th>
+                            <th class="py-3 px-3 sm:px-6 text-right">Jumlah Trx</th>
                         </tr>
                     </thead>
-                    <tbody id="gold-body" class="divide-y divide-slate-700 text-sm">
-                    </tbody>
+                    <tbody id="gold-body" class="divide-y divide-slate-100 text-sm"></tbody>
                 </table>
             </div>
         </div>
         
-        <div id="silver-container" class="hidden bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700 mt-6">
-            <div class="p-3.5 bg-slate-750 border-b border-slate-700 font-bold text-xs sm:text-sm tracking-wide text-slate-300 uppercase">
-                🔥 TOP 10 SILVER
-            </div>
+        <div id="silver-container" class="hidden bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200">
+            <div class="p-3.5 bg-slate-100 border-b border-slate-200 font-bold text-xs sm:text-sm tracking-wide text-slate-600 uppercase">?? TOP 10 SILVER</div>
             <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-0 table-fixed sm:table-auto">
-                    <thead>
-                        <tr class="bg-slate-700 text-slate-200 uppercase text-[11px] sm:text-xs tracking-wider">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-red-600 text-white">
+                        <tr class="uppercase text-[11px] sm:text-xs">
                             <th class="py-3 px-3 sm:px-6 text-center w-20">Rank</th>
-                            <th class="py-3 px-3 sm:px-6 header-nama">Nama Outlet</th>
-                            <th class="py-3 px-3 sm:px-6 w-28 sm:w-auto header-id">ID Outlet</th>
-                            <th class="py-3 px-3 sm:px-6 text-right w-28 sm:w-auto header-trx">Jumlah Trx</th>
+                            <th class="py-3 px-3 sm:px-6">Nama Outlet</th>
+                            <th class="py-3 px-3 sm:px-6">ID Outlet</th>
+                            <th class="py-3 px-3 sm:px-6 text-right">Jumlah Trx</th>
                         </tr>
                     </thead>
-                    <tbody id="silver-body" class="divide-y divide-slate-700 text-sm">
-                    </tbody>
+                    <tbody id="silver-body" class="divide-y divide-slate-100 text-sm"></tbody>
                 </table>
             </div>
         </div>
