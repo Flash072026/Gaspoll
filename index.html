@@ -32,7 +32,7 @@
         <div class="bg-slate-800 p-4 sm:p-6 rounded-xl border border-slate-700 shadow-xl">
             <h2 class="text-base sm:text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">🔍 Cek Peringkat Outlet Anda</h2>
             <div class="flex flex-col sm:flex-row gap-2.5">
-                <input type="text" id="search-input" placeholder="ID Outlet (cth: FX0001)" 
+                <input type="text" id="search-input" placeholder="ID atau Nama Outlet (cth: FX0001 / Toko Maju)" 
                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3.5 text-base text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono tracking-wider uppercase text-center sm:text-left">
                 <button onclick="searchOutlet()" 
                     class="w-full sm:w-auto bg-amber-500 active:bg-amber-600 hover:bg-amber-600 text-slate-950 font-extrabold px-6 py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md text-base min-h-[48px]">
@@ -184,17 +184,12 @@
     </main>
     
     <script>
-        // =====================================================================
-        // MASUKKAN 3 LINK CSV GOOGLE SHEET ANDA DI SINI
-        // Pastikan format akhirnya adalah /export?format=csv
-        // =====================================================================
         const PLATINUM_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFCue5biVm0vdDXgtew5lMQlJ__i22migHKfR-UBCy-HsFK0JyVLJnUnvhSWIGvGvYQ4bMZGVt_6g4/pub?gid=0&single=true&output=csv'; 
         const GOLD_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFCue5biVm0vdDXgtew5lMQlJ__i22migHKfR-UBCy-HsFK0JyVLJnUnvhSWIGvGvYQ4bMZGVt_6g4/pub?gid=26231123&single=true&output=csv'; 
         const SILVER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFCue5biVm0vdDXgtew5lMQlJ__i22migHKfR-UBCy-HsFK0JyVLJnUnvhSWIGvGvYQ4bMZGVt_6g4/pub?gid=724608384&single=true&output=csv'; 
 
         const cleanKey = (str) => str.toLowerCase().replace(/\s+/g, '').trim();
 
-        // Menyimpan data masing-masing kelas
         let globalPlatinum = [];
         let globalGold = [];
         let globalSilver = [];
@@ -281,7 +276,6 @@
                 return trxB - trxA;
             });
             
-            // Tambahkan label kelas dan rank internal untuk keperluan pencarian
             return sortedData.map((item, index) => {
                 return { ...item, _kelas: className, _rank: index + 1 };
             });
@@ -289,7 +283,6 @@
 
         async function fetchLeaderboardData() {
             try {
-                // Fetch 3 data sekaligus agar lebih cepat
                 const [platRes, goldRes, silverRes] = await Promise.all([
                     fetch(`${PLATINUM_CSV_URL}&cachebuster=${new Date().getTime()}`).then(r => r.text()),
                     fetch(`${GOLD_CSV_URL}&cachebuster=${new Date().getTime()}`).then(r => r.text()),
@@ -300,7 +293,6 @@
                 const parsedGold = csvToObjects(goldRes);
                 const parsedSilver = csvToObjects(silverRes);
                 
-                // Set Header Date dari Platinum (atau bisa disesuaikan)
                 if (parsedPlat.updateDateText) {
                     const headerSub = document.querySelector('header p');
                     if (headerSub) {
@@ -308,7 +300,6 @@
                     }
                 }
 
-                // Ambil key dinamis dari headers sheet Platinum
                 if (parsedPlat.headers.length >= 3) {
                     targetNama = parsedPlat.headers[0];
                     targetId = parsedPlat.headers[1];
@@ -319,26 +310,21 @@
                     document.querySelectorAll('.header-trx').forEach(el => el.innerText = parsedPlat.originalHeaders[2]);
                 }
 
-                // Proses dan Urutkan masing-masing kelas
                 globalPlatinum = processClassData(parsedPlat, 'PLATINUM');
                 globalGold = processClassData(parsedGold, 'GOLD');
                 globalSilver = processClassData(parsedSilver, 'SILVER');
 
-                // Gabungkan untuk fitur pencarian
                 globalAllOutlets = [...globalPlatinum, ...globalGold, ...globalSilver];
 
-                // Render Tabel - Menampilkan hanya 10 besar per kelas
                 renderTableSection('platinum-body', globalPlatinum.slice(0, 10));   
                 renderTableSection('gold-body', globalGold.slice(0, 10));     
                 renderTableSection('silver-body', globalSilver.slice(0, 10));
                 
-                // Tampilkan Container
                 document.getElementById('status-container').classList.add('hidden');
                 document.getElementById('platinum-container').classList.remove('hidden');
                 document.getElementById('gold-container').classList.remove('hidden');
                 document.getElementById('silver-container').classList.remove('hidden');
 
-                // Jika user sedang mencari sesuatu, perbarui hasil pencarian
                 const currentSearch = document.getElementById('search-input').value;
                 if (currentSearch.trim() !== "") {
                     searchOutlet(true); 
@@ -351,12 +337,15 @@
             }
         }
 
+        // =====================================================================
+        // FUNGSI PENCARIAN YANG SUDAH DIPERBAIKI (MENDUKUNG DUPLIKASI NAMA)
+        // =====================================================================
         function searchOutlet(isSilent = false) {
             const inputVal = document.getElementById('search-input').value.trim().toLowerCase();
             const resultContainer = document.getElementById('search-result-container');
 
             if (!inputVal) {
-                if (!isSilent) alert("Silakan masukkan ID Outlet terlebih dahulu!");
+                if (!isSilent) alert("Silakan masukkan ID atau Nama Outlet terlebih dahulu!");
                 return;
             }
 
@@ -365,38 +354,50 @@
                 return;
             }
 
-            // Cari di data gabungan
-            const foundIndex = globalAllOutlets.findIndex(item => String(item[targetId]).toLowerCase().trim() === inputVal);
+            // Menggunakan .filter() agar semua data yang cocok (ID sama ATAU Nama mengandung kata kunci) bisa terjaring
+            const foundOutlets = globalAllOutlets.filter(item => {
+                const matchId = String(item[targetId]).toLowerCase().trim() === inputVal;
+                const matchNama = String(item[targetNama]).toLowerCase().trim().includes(inputVal);
+                return matchId || matchNama;
+            });
 
             resultContainer.classList.remove('hidden');
+            resultContainer.innerHTML = ''; // Reset container hasil pencarian
 
-            if (foundIndex !== -1) {
-                const outletData = globalAllOutlets[foundIndex];
-                
-                // Karena kita sudah menyisipkan _kelas dan _rank saat processClassData
-                const kelasInfo = outletData._kelas;
-                const rankDiKelas = outletData._rank;
+            if (foundOutlets.length > 0) {
+                // Membuat pembungkus flex/grid list
+                let containerHtml = `<div class="space-y-4 divide-y divide-slate-800">`;
 
-                const rawTrx = parseInt(String(outletData[targetTrx]).replace(/[^0-9]/g, '')) || 0;
-                const maskedId = maskIdOutlet(outletData[targetId]);
+                foundOutlets.forEach((outletData, index) => {
+                    const kelasInfo = outletData._kelas;
+                    const rankDiKelas = outletData._rank;
+                    const rawTrx = parseInt(String(outletData[targetTrx]).replace(/[^0-9]/g, '')) || 0;
+                    const maskedId = maskIdOutlet(outletData[targetId]);
+                    
+                    // Jarak antar item jika hasil pencarian lebih dari satu
+                    const spacingClass = index > 0 ? 'pt-4' : '';
 
-                resultContainer.innerHTML = `
-                    <div class="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3.5">
-                        <div class="text-center md:text-left">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hasil Pencarian</div>
-                            <div class="text-lg font-bold text-white mt-0.5 break-words">${outletData[targetNama]}</div>
-                            <div class="text-xs font-mono text-slate-400 mt-0.5">ID: ${maskedId} • ${rawTrx.toLocaleString('id-ID')} Trx</div>
+                    containerHtml += `
+                        <div class="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3.5 ${spacingClass}">
+                            <div class="text-center md:text-left">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hasil Pencarian #${index + 1}</div>
+                                <div class="text-lg font-bold text-white mt-0.5 break-words">${outletData[targetNama]}</div>
+                                <div class="text-xs font-mono text-slate-400 mt-0.5">ID: ${maskedId} • ${rawTrx.toLocaleString('id-ID')} Trx</div>
+                            </div>
+                            <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 p-3 rounded-lg text-center flex flex-col justify-center shadow-lg min-w-[140px]">
+                                <span class="text-[10px] font-black uppercase tracking-wider opacity-75">Kelas ${kelasInfo}</span>
+                                <span class="text-xl font-black">Rank ${rankDiKelas}</span>
+                            </div>
                         </div>
-                        <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 p-3 rounded-lg text-center flex flex-col justify-center shadow-lg min-w-[140px]">
-                            <span class="text-[10px] font-black uppercase tracking-wider opacity-75">Kelas ${kelasInfo}</span>
-                            <span class="text-xl font-black">Rank ${rankDiKelas}</span>
-                        </div>
-                    </div>
-                `;
+                    `;
+                });
+
+                containerHtml += `</div>`;
+                resultContainer.innerHTML = containerHtml;
             } else {
                 resultContainer.innerHTML = `
                     <div class="text-center py-1 text-red-400 text-xs font-semibold">
-                        ❌ ID Outlet "${inputVal.toUpperCase()}" tidak ditemukan di kelas mana pun.
+                        ❌ ID atau Nama Outlet "${inputVal.toUpperCase()}" tidak ditemukan di kelas mana pun.
                     </div>
                 `;
             }
@@ -410,7 +411,6 @@
         });
 
         document.addEventListener('DOMContentLoaded', fetchLeaderboardData);
-        // Refresh otomatis setiap 1 menit (opsional)
         setInterval(fetchLeaderboardData, 60000); 
     </script>
 </body>
