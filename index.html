@@ -283,15 +283,16 @@
 
         async function fetchLeaderboardData() {
             try {
+                // Fetch 3 data sekaligus dengan memaksa browser mengabaikan cache lokal
                 const [platRes, goldRes, silverRes] = await Promise.all([
-                    fetch(`${PLATINUM_CSV_URL}&cachebuster=${new Date().getTime()}`).then(r => r.text()),
-                    fetch(`${GOLD_CSV_URL}&cachebuster=${new Date().getTime()}`).then(r => r.text()),
-                    fetch(`${SILVER_CSV_URL}&cachebuster=${new Date().getTime()}`).then(r => r.text())
+                    fetch(`${PLATINUM_CSV_URL}&cachebuster=${new Date().getTime()}`, { cache: "no-store" }).then(r => r.text()),
+                    fetch(`${GOLD_CSV_URL}&cachebuster=${new Date().getTime()}`, { cache: "no-store" }).then(r => r.text()),
+                    fetch(`${SILVER_CSV_URL}&cachebuster=${new Date().getTime()}`, { cache: "no-store" }).then(r => r.text())
                 ]);
 
-                const parsedPlat = csvToObjects(platRes);
-                const parsedGold = csvToObjects(goldRes);
-                const parsedSilver = csvToObjects(silverRes);
+                const parsedPlat = csvToObjects(platRes); [cite: 746]
+                const parsedGold = csvToObjects(goldRes); [cite: 746]
+                const parsedSilver = csvToObjects(silverRes); [cite: 746]
                 
                 if (parsedPlat.updateDateText) {
                     const headerSub = document.querySelector('header p');
