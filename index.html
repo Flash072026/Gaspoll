@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Dashboard Racing Outlet - Mobile Optimized</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #475569;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white min-h-screen pb-8">
+
+    <header class="bg-slate-800 border-b border-slate-700 py-5 px-4 text-center shadow-lg sticky top-0 z-50 backdrop-blur-md bg-slate-800/95">
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-wider text-amber-400 uppercase">🏆 GASPOLL OUTLET 🏆</h1>
+        <p class="text-slate-400 mt-2 text-sm">Update Transaksi Terakhir: Memuat...</p>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-3 sm:px-4 mt-4 space-y-4">
+        
+        <div class="bg-slate-800 p-4 sm:p-6 rounded-xl border border-slate-700 shadow-xl">
+            <h2 class="text-base sm:text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">🔍 Cek Peringkat Outlet Anda</h2>
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <input type="text" id="search-input" placeholder="ID Outlet (cth: FX0001)" 
+                    class="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3.5 text-base text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono tracking-wider uppercase text-center sm:text-left">
+                <button onclick="searchOutlet()" 
+                    class="w-full sm:w-auto bg-amber-500 active:bg-amber-600 hover:bg-amber-600 text-slate-950 font-extrabold px-6 py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md text-base min-h-[48px]">
+                    Cari Peringkat
+                </button>
+            </div>
+            
+            <div id="search-result-container" class="hidden mt-4 p-4 bg-slate-950/70 border border-slate-700 rounded-lg transition-all duration-300">
+            </div>
+        </div>
+
+        <div id="status-container" class="text-center py-8">
+            <div id="loading-spinner" class="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400 mx-auto"></div>
+            <p id="status-text" class="text-slate-400 mt-3 text-sm">Memuat data dari 3 server...</p>
+            <div id="debug-info" class="hidden mt-4 mx-auto max-w-xl p-4 bg-slate-800 border border-red-500/30 rounded-lg text-left text-xs font-mono text-red-300 overflow-x-auto"></div>
+        </div>
+
+        <div id="platinum-container" class="hidden bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700">
+            <div class="p-3.5 bg-slate-750 border-b border-slate-700 font-bold text-xs sm:text-sm tracking-wide text-slate-300 uppercase">
+                🔥 TOP 10 PLATINUM
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-0 table-fixed sm:table-auto">
+                    <thead>
+                        <tr class="bg-slate-700 text-slate-200 uppercase text-[11px] sm:text-xs tracking-wider">
+                            <th class="py-3 px-3 sm:px-6 text-center w-20">Rank</th>
+                            <th class="py-3 px-3 sm:px-6 header-nama">Nama Outlet</th>
+                            <th class="py-3 px-3 sm:px-6 w-28 sm:w-auto header-id">ID Outlet</th>
+                            <th class="py-3 px-3 sm:px-6 text-right w-28 sm:w-auto header-trx">Jumlah Trx</th>
+                        </tr>
+                    </thead>
+                    <tbody id="platinum-body" class="divide-y divide-slate-700 text-sm">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="gold-container" class="hidden bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700 mt-6">
+            <div class="p-3.5 bg-slate-750 border-b border-slate-700 font-bold text-xs sm:text-sm tracking-wide text-slate-300 uppercase">
+                🔥 TOP 10 GOLD
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-0 table-fixed sm:table-auto">
+                    <thead>
+                        <tr class="bg-slate-700 text-slate-200 uppercase text-[11px] sm:text-xs tracking-wider">
+                            <th class="py-3 px-3 sm:px-6 text-center w-20">Rank</th>
+                            <th class="py-3 px-3 sm:px-6 header-nama">Nama Outlet</th>
+                            <th class="py-3 px-3 sm:px-6 w-28 sm:w-auto header-id">ID Outlet</th>
+                            <th class="py-3 px-3 sm:px-6 text-right w-28 sm:w-auto header-trx">Jumlah Trx</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gold-body" class="divide-y divide-slate-700 text-sm">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="silver-container" class="hidden bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700 mt-6">
+            <div class="p-3.5 bg-slate-750 border-b border-slate-700 font-bold text-xs sm:text-sm tracking-wide text-slate-300 uppercase">
+                🔥 TOP 10 SILVER
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse min-w-[500px] sm:min-w-0 table-fixed sm:table-auto">
+                    <thead>
+                        <tr class="bg-slate-700 text-slate-200 uppercase text-[11px] sm:text-xs tracking-wider">
+                            <th class="py-3 px-3 sm:px-6 text-center w-20">Rank</th>
+                            <th class="py-3 px-3 sm:px-6 header-nama">Nama Outlet</th>
+                            <th class="py-3 px-3 sm:px-6 w-28 sm:w-auto header-id">ID Outlet</th>
+                            <th class="py-3 px-3 sm:px-6 text-right w-28 sm:w-auto header-trx">Jumlah Trx</th>
+                        </tr>
+                    </thead>
+                    <tbody id="silver-body" class="divide-y divide-slate-700 text-sm">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-slate-800 rounded-xl border border-slate-700 shadow-xl p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-3 mb-4 gap-2">
+                <h2 class="text-base sm:text-xl font-bold text-amber-400 flex items-center gap-2">
+                    📢 Periode (Sept-Okt-Nov-Des 2026)
+                </h2>
+                <span class="bg-emerald-500/10 text-emerald-400 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/20 w-fit">
+                    🟢 Program GasPoll
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                <div class="bg-slate-900/60 p-3.5 rounded-lg border border-slate-750">
+                    <div class="text-amber-400 text-base font-bold mb-0.5">🎁 TOTAL HADIAH</div>
+                    <p class="text-sm font-semibold text-emerald-400">3 Outlet Teratas (Platinum)</p>
+                    <p class="text-xs text-slate-400 mt-1">Rank 1 saldo Rp 500.000</p>
+                    <p class="text-xs text-slate-400 mt-1">Rank 2 saldo Rp 350.000</p>
+                    <p class="text-xs text-slate-400 mt-1">Rank 3 saldo Rp 150.000</p>
+                </div>
+                <div class="bg-slate-900/60 p-3.5 rounded-lg border border-slate-750">
+                    <div class="text-amber-400 text-base font-bold mb-0.5">🎁 TOTAL HADIAH</div>
+                    <p class="text-sm font-semibold text-emerald-400">3 Outlet Teratas (Gold)</p>
+                    <p class="text-xs text-slate-400 mt-1">Rank 1 saldo Rp 150.000</p>
+                    <p class="text-xs text-slate-400 mt-1">Rank 2 saldo Rp 100.000</p>
+                    <p class="text-xs text-slate-400 mt-1">Rank 3 saldo Rp 75.000</p>
+                </div>
+                <div class="bg-slate-900/60 p-3.5 rounded-lg border border-slate-750">
+                    <div class="text-amber-400 text-base font-bold mb-0.5">🎁 TOTAL HADIAH</div>
+                    <p class="text-sm font-semibold text-emerald-400">3 Outlet Teratas (Silver)</p>
+                    <p class="text-xs text-slate-400 mt-1">Rank 1 saldo Rp 75.000</p>
+                    <p class="text-xs text-slate-400 mt-1">Rank 2 saldo Rp 50.000</p>
+                    <p class="text-xs text-slate-400 mt-1">Rank 3 saldo Rp 25.000</p>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">📋 Alur Kompetisi</h3>
+                <ol class="space-y-2.5 text-xs sm:text-sm text-slate-300">
+                    <li class="flex gap-2.5 items-start">
+                        <span class="flex items-center justify-center bg-amber-500 text-slate-950 font-black rounded-full h-5 w-5 text-[11px] flex-shrink-0 mt-0.5">1</span>
+                        <span>Seluruh outlet otomatis terdaftar minimal 1 kali transaksi tanpa perlu registrasi manual.</span>
+                    </li>
+                    <li class="flex gap-2.5 items-start">
+                        <span class="flex items-center justify-center bg-amber-500 text-slate-950 font-black rounded-full h-5 w-5 text-[11px] flex-shrink-0 mt-0.5">2</span>
+                        <span>Pencapaian di hitung dari seluruh total transaksi harian.</span>
+                    </li>
+                    <li class="flex gap-2.5 items-start">
+                        <span class="flex items-center justify-center bg-amber-500 text-slate-950 font-black rounded-full h-5 w-5 text-[11px] flex-shrink-0 mt-0.5">3</span>
+                        <span>Tingkatkan transaksi harianmu untuk menaikkan posisi klasemen.</span>
+                    </li>
+                    </li>
+                    <li class="flex gap-2.5 items-start">
+                        <span class="flex items-center justify-center bg-amber-500 text-slate-950 font-black rounded-full h-5 w-5 text-[11px] flex-shrink-0 mt-0.5">4</span>
+                        <span>Cek kolom pencarian di atas secara berkala untuk memantau peringkat Anda.</span>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="bg-slate-950/50 p-3.5 rounded-lg border border-slate-750 text-[11px] sm:text-xs text-slate-400 space-y-1.5 leading-relaxed">
+                <div class="font-bold text-slate-300 uppercase tracking-wider mb-1 text-[11px]">⚠️ Syarat & Ketentuan Tambahan:</div>
+                <p>• Jika skor transaksi seri di akhir periode, peringkat unggul diberikan kepada yang mencapai target terlebih dahulu.</p>
+                <p>• Segala bentuk manipulasi atau kecurangan transaksi akan didiskualifikasi sepihak.</p>
+                <p>• Transaksi yang dihitung hanyalah transaksi sukses kecuali produk Cek (cek Vc, Cek ID, dan Inq lainnya).</p>
+                <p>• Keputusan panitia mutlak dan tidak dapat diganggu gugat.</p>
+            </div>
+        </div>
+
+    </main>
+    
+    <script>
+        // =====================================================================
+        // MASUKKAN 3 LINK CSV GOOGLE SHEET ANDA DI SINI
+        // Pastikan format akhirnya adalah /export?format=csv
+        // =====================================================================
+        const PLATINUM_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFCue5biVm0vdDXgtew5lMQlJ__i22migHKfR-UBCy-HsFK0JyVLJnUnvhSWIGvGvYQ4bMZGVt_6g4/pub?gid=0&single=true&output=csv'; 
+        const GOLD_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFCue5biVm0vdDXgtew5lMQlJ__i22migHKfR-UBCy-HsFK0JyVLJnUnvhSWIGvGvYQ4bMZGVt_6g4/pub?gid=26231123&single=true&output=csv'; 
+        const SILVER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFCue5biVm0vdDXgtew5lMQlJ__i22migHKfR-UBCy-HsFK0JyVLJnUnvhSWIGvGvYQ4bMZGVt_6g4/pub?gid=724608384&single=true&output=csv'; 
+
+        const cleanKey = (str) => str.toLowerCase().replace(/\s+/g, '').trim();
+
+        // Menyimpan data masing-masing kelas
+        let globalPlatinum = [];
+        let globalGold = [];
+        let globalSilver = [];
+        let globalAllOutlets = []; 
+
+        let targetNama = 'namaoutlet';
+        let targetId = 'idoutlet';
+        let targetTrx = 'jumlahtrx';
+
+        function csvToObjects(csvText) {
+            const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length < 2) return { data: [], headers: [], originalHeaders: [], updateDateText: '' };
+            
+            const firstLineRaw = lines[0].replace(/^"|"$/g, '').trim();
+            let updateDateText = '';
+
+            if (firstLineRaw.includes('","') || firstLineRaw.includes(',')) {
+                const firstLineCols = firstLineRaw.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
+                updateDateText = firstLineCols[1] ? firstLineCols[1] : firstLineCols[0];
+            } else {
+                updateDateText = firstLineRaw.replace(/update\s*data\s*:/i, '').replace(/update/i, '').trim();
+            }
+
+            const originalHeaders = lines[1].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.trim().replace(/^"|"$/g, ''));
+            const cleanHeaders = originalHeaders.map(cleanKey);
+            
+            const result = [];
+            for (let i = 2; i < lines.length; i++) {
+                const currentline = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
+                const obj = {};
+                cleanHeaders.forEach((header, index) => {
+                    obj[header] = currentline[index] !== undefined ? currentline[index] : '';
+                });
+                result.push(obj);
+            }
+            return { data: result, headers: cleanHeaders, originalHeaders: originalHeaders, updateDateText: updateDateText };
+        }
+
+        function maskIdOutlet(idStr) {
+            if (!idStr) return '-';
+            const str = String(idStr).trim();
+            if (str.length >= 6) {
+                return str.slice(0, 2) + '**' + str.slice(-2);
+            }
+            if (str.length <= 2) return str;
+            return str.slice(0, 1) + '**' + str.slice(-1);
+        }
+
+        function renderTableSection(bodyId, dataArray) {
+            const tableBody = document.getElementById(bodyId);
+            tableBody.innerHTML = ''; 
+
+            if(dataArray.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="py-3 text-center text-slate-500 text-xs">Belum ada data</td></tr>`;
+                return;
+            }
+
+            dataArray.forEach((outlet, index) => {
+                const classRank = index + 1; 
+                let rankBadge = `<span class="font-bold text-slate-400 text-sm">${classRank}</span>`;
+                let rowBg = "hover:bg-slate-750/50 transition-colors";
+                
+                if (classRank === 1) rankBadge = `<span class="inline-flex items-center justify-center bg-amber-500 text-slate-950 w-14 py-0.5 rounded-full text-[11px] font-black shadow-sm">🥇 1</span>`;
+                else if (classRank === 2) rankBadge = `<span class="inline-flex items-center justify-center bg-slate-300 text-slate-950 w-14 py-0.5 rounded-full text-[11px] font-black shadow-sm">🥈 2</span>`;
+                else if (classRank === 3) rankBadge = `<span class="inline-flex items-center justify-center bg-amber-700 text-white w-14 py-0.5 rounded-full text-[11px] font-black shadow-sm">🥉 3</span>`;
+
+                const rawTrx = parseInt(String(outlet[targetTrx]).replace(/[^0-9]/g, '')) || 0;
+                const maskedId = maskIdOutlet(outlet[targetId]);
+
+                tableBody.innerHTML += `
+                    <tr class="${rowBg}">
+                        <td class="py-3 px-2 text-center">${rankBadge}</td>
+                        <td class="py-3 px-3 sm:px-6 font-medium text-white break-words max-w-[120px] sm:max-w-none">${outlet[targetNama] || '-'}</td>
+                        <td class="py-3 px-3 sm:px-6 text-slate-400 font-mono text-xs sm:text-sm">${maskedId}</td>
+                        <td class="py-3 px-3 sm:px-6 text-right text-emerald-400 font-bold text-xs sm:text-sm">${rawTrx.toLocaleString('id-ID')} Trx</td>
+                    </tr>`;
+            });
+        }
+
+        function processClassData(parsedData, className) {
+            let sortedData = parsedData.data.sort((a, b) => {
+                const trxA = parseInt(String(a[targetTrx]).replace(/[^0-9]/g, '')) || 0;
+                const trxB = parseInt(String(b[targetTrx]).replace(/[^0-9]/g, '')) || 0;
+                return trxB - trxA;
+            });
+            
+            // Tambahkan label kelas dan rank internal untuk keperluan pencarian
+            return sortedData.map((item, index) => {
+                return { ...item, _kelas: className, _rank: index + 1 };
+            });
+        }
+
+        async function fetchLeaderboardData() {
+            try {
+                // Fetch 3 data sekaligus agar lebih cepat
+                const [platRes, goldRes, silverRes] = await Promise.all([
+                    fetch(`${PLATINUM_CSV_URL}&cachebuster=${new Date().getTime()}`).then(r => r.text()),
+                    fetch(`${GOLD_CSV_URL}&cachebuster=${new Date().getTime()}`).then(r => r.text()),
+                    fetch(`${SILVER_CSV_URL}&cachebuster=${new Date().getTime()}`).then(r => r.text())
+                ]);
+
+                const parsedPlat = csvToObjects(platRes);
+                const parsedGold = csvToObjects(goldRes);
+                const parsedSilver = csvToObjects(silverRes);
+                
+                // Set Header Date dari Platinum (atau bisa disesuaikan)
+                if (parsedPlat.updateDateText) {
+                    const headerSub = document.querySelector('header p');
+                    if (headerSub) {
+                        headerSub.innerText = `Update Transaksi Terakhir: ${parsedPlat.updateDateText}`;
+                    }
+                }
+
+                // Ambil key dinamis dari headers sheet Platinum
+                if (parsedPlat.headers.length >= 3) {
+                    targetNama = parsedPlat.headers[0];
+                    targetId = parsedPlat.headers[1];
+                    targetTrx = parsedPlat.headers[2];
+                    
+                    document.querySelectorAll('.header-nama').forEach(el => el.innerText = parsedPlat.originalHeaders[0]);
+                    document.querySelectorAll('.header-id').forEach(el => el.innerText = parsedPlat.originalHeaders[1]);
+                    document.querySelectorAll('.header-trx').forEach(el => el.innerText = parsedPlat.originalHeaders[2]);
+                }
+
+                // Proses dan Urutkan masing-masing kelas
+                globalPlatinum = processClassData(parsedPlat, 'PLATINUM');
+                globalGold = processClassData(parsedGold, 'GOLD');
+                globalSilver = processClassData(parsedSilver, 'SILVER');
+
+                // Gabungkan untuk fitur pencarian
+                globalAllOutlets = [...globalPlatinum, ...globalGold, ...globalSilver];
+
+                // Render Tabel - Menampilkan hanya 10 besar per kelas
+                renderTableSection('platinum-body', globalPlatinum.slice(0, 10));   
+                renderTableSection('gold-body', globalGold.slice(0, 10));     
+                renderTableSection('silver-body', globalSilver.slice(0, 10));
+                
+                // Tampilkan Container
+                document.getElementById('status-container').classList.add('hidden');
+                document.getElementById('platinum-container').classList.remove('hidden');
+                document.getElementById('gold-container').classList.remove('hidden');
+                document.getElementById('silver-container').classList.remove('hidden');
+
+                // Jika user sedang mencari sesuatu, perbarui hasil pencarian
+                const currentSearch = document.getElementById('search-input').value;
+                if (currentSearch.trim() !== "") {
+                    searchOutlet(true); 
+                }
+
+            } catch (error) {
+                document.getElementById('status-text').innerHTML = `<span class="text-red-400 font-bold text-sm">⚠️ Gagal Memuat Data</span>`;
+                document.getElementById('debug-info').classList.remove('hidden');
+                document.getElementById('debug-info').innerText = `Log Error:\n${error.message}\n(Pastikan 3 Link CSV sudah benar dan dipublish)`;
+            }
+        }
+
+        function searchOutlet(isSilent = false) {
+            const inputVal = document.getElementById('search-input').value.trim().toLowerCase();
+            const resultContainer = document.getElementById('search-result-container');
+
+            if (!inputVal) {
+                if (!isSilent) alert("Silakan masukkan ID Outlet terlebih dahulu!");
+                return;
+            }
+
+            if (globalAllOutlets.length === 0) {
+                if (!isSilent) alert("Data belum siap atau gagal dimuat.");
+                return;
+            }
+
+            // Cari di data gabungan
+            const foundIndex = globalAllOutlets.findIndex(item => String(item[targetId]).toLowerCase().trim() === inputVal);
+
+            resultContainer.classList.remove('hidden');
+
+            if (foundIndex !== -1) {
+                const outletData = globalAllOutlets[foundIndex];
+                
+                // Karena kita sudah menyisipkan _kelas dan _rank saat processClassData
+                const kelasInfo = outletData._kelas;
+                const rankDiKelas = outletData._rank;
+
+                const rawTrx = parseInt(String(outletData[targetTrx]).replace(/[^0-9]/g, '')) || 0;
+                const maskedId = maskIdOutlet(outletData[targetId]);
+
+                resultContainer.innerHTML = `
+                    <div class="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3.5">
+                        <div class="text-center md:text-left">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hasil Pencarian</div>
+                            <div class="text-lg font-bold text-white mt-0.5 break-words">${outletData[targetNama]}</div>
+                            <div class="text-xs font-mono text-slate-400 mt-0.5">ID: ${maskedId} • ${rawTrx.toLocaleString('id-ID')} Trx</div>
+                        </div>
+                        <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 p-3 rounded-lg text-center flex flex-col justify-center shadow-lg min-w-[140px]">
+                            <span class="text-[10px] font-black uppercase tracking-wider opacity-75">Kelas ${kelasInfo}</span>
+                            <span class="text-xl font-black">Rank ${rankDiKelas}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultContainer.innerHTML = `
+                    <div class="text-center py-1 text-red-400 text-xs font-semibold">
+                        ❌ ID Outlet "${inputVal.toUpperCase()}" tidak ditemukan di kelas mana pun.
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchOutlet();
+                document.getElementById('search-input').blur();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', fetchLeaderboardData);
+        // Refresh otomatis setiap 1 menit (opsional)
+        setInterval(fetchLeaderboardData, 60000); 
+    </script>
+</body>
+</html>
